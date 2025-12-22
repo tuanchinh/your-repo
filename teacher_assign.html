@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>📤 Giao bài & Học liệu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    font-family:Segoe UI, sans-serif;
+    background:#eef3f7;
+    margin:0;
+}
+.wrap{
+    max-width:960px;
+    margin:30px auto;
+    background:#fff;
+    padding:25px;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+}
+h1{text-align:center;color:#0a4a8e}
+label{font-weight:600;margin-top:12px;display:block}
+select,input,textarea{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    border:1px solid #c7d7e4;
+    border-radius:8px;
+    font-size:15px;
+}
+textarea{resize:vertical}
+button{
+    background:#0b74d1;
+    color:#fff;
+    padding:14px 22px;
+    margin-top:20px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:17px;
+}
+button:hover{background:#095ba8}
+.back-btn{background:#888}
+.back-btn:hover{background:#666}
+
+.success{
+    background:#e1fbd8;
+    padding:12px;
+    border-left:5px solid #4caf50;
+    border-radius:8px;
+    margin-top:20px;
+}
+.error{
+    background:#ffe2e2;
+    padding:12px;
+    border-left:5px solid #e53935;
+    border-radius:8px;
+    margin-top:20px;
+}
+.section{
+    margin-top:30px;
+    padding-top:20px;
+    border-top:2px dashed #d0dbe6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<button class="back-btn" onclick="window.location.href='teacher_dashboard.html'">← Quay lại</button>
+
+<h1>📤 GIAO BÀI & HỌC LIỆU</h1>
+<div id="msg"></div>
+
+<!-- ================= GIAO BÀI KIỂM TRA ================= -->
+<div class="section">
+<h2>📝 Giao bài kiểm tra</h2>
+
+<label>Chọn lớp:</label>
+<select id="assignClass">
+  <option value="6A">6A</option>
+  <option value="6B">6B</option>
+  <option value="7A1">7A1</option>
+  <option value="7A2">7A2</option>
+  <option value="8A">8A</option>
+  <option value="9A">9A</option>
+</select>
+
+<label>Chọn đề kiểm tra:</label>
+<select id="assignExam">
+  <option>⏳ Đang tải đề...</option>
+</select>
+
+<label>Hạn nộp:</label>
+<input type="datetime-local" id="assignDeadline">
+
+<button onclick="assignExam()">📤 Giao bài</button>
+</div>
+
+<!-- ================= GỬI HỌC LIỆU ================= -->
+<div class="section">
+<h2>📚 Gửi học liệu cho học sinh</h2>
+
+<label>Lớp nhận học liệu:</label>
+<select id="materialClass">
+  <option value="6A">6A</option>
+  <option value="6B">6B</option>
+  <option value="7A1">7A1</option>
+  <option value="7A2">7A2</option>
+  <option value="8A">8A</option>
+  <option value="9A">9A</option>
+</select>
+
+<label>Tiêu đề học liệu:</label>
+<input type="text" id="materialTitle" placeholder="Ví dụ: Bài 7 – Internet">
+
+<label>Link học liệu (PDF / Video / Drive):</label>
+<input type="text" id="materialLink" placeholder="https://...">
+
+<label>Ghi chú:</label>
+<textarea id="materialNote" rows="3"></textarea>
+
+<button onclick="sendMaterial()">📘 Gửi học liệu</button>
+</div>
+
+</div>
+
+<script>
+// ================== CHẶN TRUY CẬP ==================
+if(localStorage.getItem("role")!=="teacher"){
+    alert("Bạn không có quyền!");
+    location.href="index.html";
+}
+
+// ================== LOAD ĐỀ ==================
+async function loadExams(){
+    const select=document.getElementById("assignExam");
+    select.innerHTML="<option>⏳ Đang tải đề...</option>";
+
+    try{
+        const res=await fetch("./data/exams/index.json",{cache:"no-store"});
+        const data=await res.json();
+
+        select.innerHTML="<option value=''>-- Chọn đề --</option>";
+        data.exams.forEach(e=>{
+            const opt=document.createElement("option");
+            opt.value=e.file;
+            opt.textContent=`[Lớp ${e.grade}] ${e.title}`;
+            select.appendChild(opt);
+        });
+    }catch{
+        select.innerHTML="<option>❌ Không tải được đề</option>";
+    }
+}
+
+// ================== GIAO BÀI ==================
+function assignExam(){
+    const cls=assignClass.value;
+    const exam=assignExam.value;
+    const deadline=assignDeadline.value;
+    const msg=document.getElementById("msg");
+
+    if(!exam||!deadline){
+        msg.innerHTML="<div class='error'>⚠️ Thiếu thông tin</div>";
+        return;
+    }
+
+    const list=JSON.parse(localStorage.getItem("assigned_exams")||"[]");
+
+    list.push({
+        examFile: exam,
+        className: cls,
+        deadline,
+        teacher: localStorage.getItem("username"),
+        assignedAt: new Date().toLocaleString(),
+        active: true
+    });
+
+    localStorage.setItem("assigned_exams",JSON.stringify(list));
+
+    msg.innerHTML=`<div class='success'>✅ Đã giao bài cho lớp ${cls}</div>`;
+    assignDeadline.value="";
+}
+
+// ================== GỬI HỌC LIỆU ==================
+function sendMaterial(){
+    const cls=materialClass.value;
+    const title=materialTitle.value.trim();
+    const link=materialLink.value.trim();
+    const note=materialNote.value.trim();
+    const msg=document.getElementById("msg");
+
+    if(!title||!link){
+        msg.innerHTML="<div class='error'>⚠️ Thiếu tiêu đề hoặc link</div>";
+        return;
+    }
+
+    const materials=JSON.parse(localStorage.getItem("learning_materials")||"[]");
+
+    materials.push({
+        className: cls,
+        title,
+        link,
+        note,
+        teacher: localStorage.getItem("username"),
+        sentAt: new Date().toLocaleString()
+    });
+
+    localStorage.setItem("learning_materials",JSON.stringify(materials));
+
+    msg.innerHTML=`<div class='success'>📘 Đã gửi học liệu cho lớp ${cls}</div>`;
+
+    materialTitle.value="";
+    materialLink.value="";
+    materialNote.value="";
+}
+
+// ================== INIT ==================
+loadExams();
+</script>
+
+</body>
+</html>

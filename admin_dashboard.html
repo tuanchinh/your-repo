@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>ADMIN DASHBOARD (ONLINE)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    font-family:Segoe UI, sans-serif;
+    background:#edf2f7;
+    margin:0;
+}
+header{
+    background:#1e293b;
+    color:#fff;
+    padding:18px;
+    text-align:center;
+    font-size:24px;
+}
+.wrap{
+    max-width:1100px;
+    margin:25px auto;
+    background:#fff;
+    padding:25px;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:18px;
+}
+.card{
+    background:#f8fafc;
+    padding:18px;
+    border-radius:12px;
+    text-align:center;
+    border-left:6px solid #2563eb;
+}
+.card h2{margin:0;font-size:36px;color:#2563eb}
+.card p{margin:6px 0 0;color:#555}
+
+.menu{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:18px;
+}
+.menu button{
+    padding:16px;
+    font-size:17px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    background:#2563eb;
+    color:#fff;
+}
+.menu button:hover{background:#1e40af}
+.danger{background:#dc2626}
+.danger:hover{background:#991b1b}
+.logout{background:#64748b}
+.logout:hover{background:#475569}
+</style>
+</head>
+
+<body>
+
+<header>🛠️ ADMIN – QUẢN TRỊ HỆ THỐNG (ONLINE)</header>
+
+<div class="wrap">
+
+<h3>📊 Thống kê hệ thống</h3>
+
+<div class="grid">
+    <div class="card">
+        <h2 id="tTeachers">0</h2>
+        <p>Giáo viên</p>
+    </div>
+    <div class="card">
+        <h2 id="tStudents">0</h2>
+        <p>Học sinh</p>
+    </div>
+    <div class="card">
+        <h2 id="tExams">0</h2>
+        <p>Đề kiểm tra</p>
+    </div>
+    <div class="card">
+        <h2 id="tAssignments">0</h2>
+        <p>Bài đã giao</p>
+    </div>
+</div>
+
+<h3>⚙️ Quản trị</h3>
+
+<div class="menu">
+    <button onclick="go('teacher_dashboard.html')">👨‍🏫 Quản lý giáo viên</button>
+    <button onclick="go('teacher_class_6.html')">📘 Lớp 6</button>
+    <button onclick="go('teacher_class_7.html')">📗 Lớp 7</button>
+    <button onclick="go('teacher_class_8.html')">📙 Lớp 8</button>
+    <button onclick="go('teacher_class_9.html')">📕 Lớp 9</button>
+
+    <button onclick="go('teacher_create_exam.html')">📝 Ngân hàng đề</button>
+    <button onclick="go('teacher_assign.html')">📤 Bài đã giao</button>
+    <button onclick="go('teacher_submissions.html')">📥 Bài nộp</button>
+
+    <button class="danger" onclick="resetSystem()">🗑️ Reset hệ thống</button>
+    <button class="logout" onclick="logout()">🚪 Đăng xuất</button>
+</div>
+
+</div>
+
+<script>
+/* ===============================
+   CHẶN TRUY CẬP
+================================ */
+if(localStorage.getItem("role")!=="admin"){
+    alert("Không có quyền Admin!");
+    location.href="login.html";
+}
+
+/* ===============================
+   LOAD THỐNG KÊ (ONLINE)
+================================ */
+async function loadStats(){
+    try{
+        const res = await fetch("http://localhost:3000/api/admin/stats");
+        if(!res.ok) throw new Error("Không kết nối server");
+        const d = await res.json();
+
+        document.getElementById("tTeachers").innerText = d.teachers;
+        document.getElementById("tStudents").innerText = d.students;
+        document.getElementById("tExams").innerText = d.exams;
+        document.getElementById("tAssignments").innerText = d.assignments;
+
+    }catch(e){
+        alert("❌ Không kết nối được server 3000");
+        console.error(e);
+    }
+}
+
+/* ===============================
+   RESET HỆ THỐNG
+================================ */
+async function resetSystem(){
+    if(!confirm("⚠️ Xóa toàn bộ dữ liệu?")) return;
+    try{
+        const res = await fetch("http://localhost:3000/api/admin/reset",{method:"POST"});
+        const r = await res.json();
+        alert(r.message || "Đã reset");
+        loadStats();
+    }catch(e){
+        alert("Lỗi reset!");
+    }
+}
+
+/* ===============================
+   TIỆN ÍCH
+================================ */
+function go(p){location.href=p}
+function logout(){
+    localStorage.clear();
+    location.href="login.html";
+}
+
+/* ===============================
+   INIT
+================================ */
+loadStats();
+</script>
+
+</body>
+</html>

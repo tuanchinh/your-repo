@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý lớp 8</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+body{font-family:Arial;background:#eef2f3;margin:0}
+header{background:#7b2cbf;color:white;padding:15px;font-size:24px;text-align:center}
+.container{width:90%;margin:auto;margin-top:20px}
+table{width:100%;border-collapse:collapse;background:white}
+th,td{border:1px solid #ccc;padding:8px}
+th{background:#7b2cbf;color:white}
+button{padding:6px 12px;border:none;border-radius:4px;cursor:pointer}
+.delete-btn{background:#d00000;color:white}
+.add-btn{background:#2b9348;color:white}
+.back-btn{background:#6c757d;color:white}
+.box{background:white;padding:15px;margin-top:20px;border-radius:6px;box-shadow:0 0 5px #bbb}
+</style>
+</head>
+
+<body>
+
+<header>📘 QUẢN LÝ DANH SÁCH HỌC SINH LỚP 8</header>
+
+<div class="container">
+
+<table id="studentTable">
+<tr>
+    <th>STT</th>
+    <th>Họ và tên</th>
+    <th>Username</th>
+    <th>Password</th>
+    <th>Thao tác</th>
+</tr>
+</table>
+
+<div class="box">
+<h3>📥 Nhập Excel (chỉ cột HỌ TÊN)</h3>
+<input type="file" id="excelFile" accept=".xls,.xlsx">
+<button class="add-btn" onclick="importExcel()">Nhập Excel</button>
+<p>Password mặc định: <b>123456</b></p>
+</div>
+
+<br>
+<button class="back-btn" onclick="location.href='teacher_dashboard.html'">⬅ Quay lại</button>
+
+</div>
+
+<script>
+let students = JSON.parse(localStorage.getItem("students_grade8")) || [];
+
+function toUsername(str){
+    return str.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+        .replace(/đ/g,"d")
+        .replace(/[^a-z\s]/g,"")
+        .trim().replace(/\s+/g,"_");
+}
+
+function save(){ localStorage.setItem("students_grade8",JSON.stringify(students)); }
+
+function loadTable(){
+    const t=document.getElementById("studentTable");
+    t.innerHTML=`<tr><th>STT</th><th>Họ và tên</th><th>Username</th><th>Password</th><th>Thao tác</th></tr>`;
+    students.forEach((s,i)=>{
+        t.innerHTML+=`
+        <tr>
+            <td>${i+1}</td>
+            <td>${s.fullname}</td>
+            <td>${s.username}</td>
+            <td>${s.password}</td>
+            <td><button class="delete-btn" onclick="del(${i})">Xóa</button></td>
+        </tr>`;
+    });
+}
+
+function importExcel(){
+    const file=document.getElementById("excelFile").files[0];
+    if(!file) return alert("Chưa chọn file");
+
+    const r=new FileReader();
+    r.onload=e=>{
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
+        const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1});
+        for(let i=1;i<rows.length;i++){
+            let name=rows[i][1]||rows[i][0];
+            if(!name) continue;
+            let u=toUsername(name);
+            if(students.some(s=>s.username===u)) continue;
+            students.push({fullname:name.trim(),username:u,password:"123456"});
+        }
+        save(); loadTable();
+        alert("✅ Nhập xong danh sách lớp 8");
+    };
+    r.readAsArrayBuffer(file);
+}
+
+function del(i){
+    if(confirm("Xóa học sinh?")){
+        students.splice(i,1); save(); loadTable();
+    }
+}
+
+loadTable();
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Chấm bài học sinh</title>
+<style>
+body{font-family:Arial;background:#f4f6f9;margin:0}
+header{background:#198754;color:white;padding:15px;font-size:20px}
+.container{width:95%;margin:auto;margin-top:20px}
+.card{background:white;padding:15px;border-radius:8px;margin-bottom:15px}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:8px}
+th{background:#198754;color:white}
+textarea{width:100%;height:100px}
+input[type=number]{width:80px}
+button{padding:6px 12px;border:none;border-radius:5px;background:#198754;color:white;cursor:pointer}
+button:hover{background:#146c43}
+.pending{color:red;font-weight:bold}
+.done{color:green;font-weight:bold}
+</style>
+</head>
+<body>
+
+<header>🧑‍🏫 CHẤM BÀI HỌC SINH</header>
+
+<div class="container">
+
+<div class="card">
+  <h3>📋 Danh sách bài nộp</h3>
+  <table>
+    <tr>
+      <th>Học sinh</th>
+      <th>Lớp</th>
+      <th>Bài</th>
+      <th>Trạng thái</th>
+      <th>Thao tác</th>
+    </tr>
+    <tbody id="submissionList"></tbody>
+  </table>
+</div>
+
+<div class="card" id="gradeBox" style="display:none">
+  <h3>✍️ Chấm bài</h3>
+  <p><strong>Học sinh:</strong> <span id="sName"></span></p>
+  <p><strong>Bài:</strong> <span id="sExam"></span></p>
+
+  <h4>Bài làm:</h4>
+  <pre id="sAnswer" style="background:#f1f1f1;padding:10px"></pre>
+
+  <label>Điểm:</label>
+  <input type="number" id="score" min="0" max="10" step="0.25">
+
+  <label>Nhận xét:</label>
+  <textarea id="note"></textarea>
+
+  <br><br>
+  <button onclick="saveGrade()">💾 Lưu điểm</button>
+</div>
+
+</div>
+
+<script>
+let submissions = JSON.parse(localStorage.getItem("offline_submissions")) || [];
+let currentIndex = -1;
+
+// ============================
+// LOAD DANH SÁCH
+// ============================
+function loadList(){
+    const tbody=document.getElementById("submissionList");
+    tbody.innerHTML="";
+
+    if(submissions.length===0){
+        tbody.innerHTML=`<tr><td colspan="5">Chưa có bài nộp</td></tr>`;
+        return;
+    }
+
+    submissions.forEach((s,i)=>{
+        tbody.innerHTML+=`
+        <tr>
+          <td>${s.username}</td>
+          <td>${s.grade}</td>
+          <td>${s.examTitle}</td>
+          <td class="${s.score==null?'pending':'done'}">
+            ${s.score==null?'Chưa chấm':'Đã chấm'}
+          </td>
+          <td>
+            <button onclick="openGrade(${i})">Chấm</button>
+          </td>
+        </tr>
+        `;
+    });
+}
+
+// ============================
+// MỞ BÀI
+// ============================
+function openGrade(i){
+    currentIndex=i;
+    const s=submissions[i];
+
+    document.getElementById("gradeBox").style.display="block";
+    document.getElementById("sName").innerText=s.username;
+    document.getElementById("sExam").innerText=s.examTitle;
+    document.getElementById("sAnswer").innerText=s.answers || "(Không có nội dung)";
+    document.getElementById("score").value=s.score ?? "";
+    document.getElementById("note").value=s.teacherNote ?? "";
+}
+
+// ============================
+// LƯU ĐIỂM
+// ============================
+function saveGrade(){
+    if(currentIndex<0) return;
+
+    submissions[currentIndex].score =
+        document.getElementById("score").value;
+    submissions[currentIndex].teacherNote =
+        document.getElementById("note").value;
+
+    localStorage.setItem("offline_submissions",JSON.stringify(submissions));
+    alert("✅ Đã lưu điểm");
+    loadList();
+}
+
+loadList();
+</script>
+
+</body>
+</html>

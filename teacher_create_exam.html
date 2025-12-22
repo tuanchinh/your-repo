@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Tạo đề kiểm tra</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:"Segoe UI",Arial,sans-serif;
+  background:linear-gradient(180deg,#dcecff,#eef6ff);
+  color:#1e3a5f;
+}
+header{
+  background:#1e4f91;
+  padding:14px;
+  text-align:center;
+  color:#f5c542;
+  font-weight:800;
+}
+.container{max-width:1100px;margin:auto;padding:16px}
+.section{
+  background:#fff;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.15);
+}
+.section h2{margin-top:0;color:#1e4f91}
+input,textarea,select{
+  width:100%;padding:10px;margin-top:6px;
+  border-radius:8px;border:1px solid #c7d7ea;
+}
+textarea{min-height:70px}
+button{
+  margin-top:10px;padding:10px 14px;
+  border:none;border-radius:10px;
+  background:#1e4f91;color:#fff;
+  font-weight:bold;cursor:pointer;
+}
+button:hover{background:#163d70}
+.small-btn{background:#d93025}
+.question{
+  border:1px dashed #c7d7ea;
+  padding:12px;border-radius:10px;margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>E-Learning – Quài Tở – Tênh Phông</header>
+
+<div class="container">
+
+<!-- ===== THÔNG TIN ===== -->
+<div class="section">
+<h2>📝 Thông tin đề</h2>
+<input id="examTitle" placeholder="Tên đề kiểm tra">
+<select id="topic">
+  <option value="tin6">Tin học 6 – Bài 1</option>
+  <option value="tin7">Tin học 7 – Bài 3</option>
+</select>
+</div>
+
+<!-- ===== NGÂN HÀNG ===== -->
+<div class="section">
+<h2>📚 Tự động lấy câu hỏi từ ngân hàng</h2>
+<label>Số câu trắc nghiệm</label>
+<input type="number" id="numMCQ" value="3">
+
+<label>Số câu đúng / sai</label>
+<input type="number" id="numTF" value="1">
+
+<label>Số câu tự luận</label>
+<input type="number" id="numEssay" value="1">
+
+<button onclick="autoFill()">⚡ Tự động tạo đề</button>
+</div>
+
+<!-- ===== NỘI DUNG ĐỀ ===== -->
+<div class="section">
+<h2>I. Trắc nghiệm</h2>
+<div id="mcq"></div>
+</div>
+
+<div class="section">
+<h2>II. Đúng / Sai</h2>
+<div id="tf"></div>
+</div>
+
+<div class="section">
+<h2>III. Tự luận</h2>
+<div id="essay"></div>
+</div>
+
+<button onclick="exportWord()">📄 Xuất file Word</button>
+
+</div>
+
+<script>
+/* ===== NGÂN HÀNG CÂU HỎI (MẪU) ===== */
+const bank = {
+  tin6: {
+    mcq:[
+      {q:"Máy tính dùng để làm gì?",a:["Học","Chơi","Làm việc","Tất cả"],ans:"D"},
+      {q:"Thiết bị nhập là?",a:["Chuột","Màn hình","Loa","Máy in"],ans:"A"},
+      {q:"Internet là gì?",a:["Mạng máy tính","Phần mềm","Thiết bị","Trò chơi"],ans:"A"}
+    ],
+    tf:[
+      {q:"Đánh dấu đúng/sai",a:["Máy tính cần điện","Chuột là thiết bị nhập","Màn hình nhập dữ liệu","Internet giúp học tập"]}
+    ],
+    essay:["Nêu ích lợi của Internet"]
+  }
+};
+
+/* ===== AUTO FILL ===== */
+function autoFill(){
+  mcq.innerHTML=tf.innerHTML=essay.innerHTML="";
+  const t = topic.value;
+  bank[t].mcq.slice(0,numMCQ.value).forEach(x=>{
+    mcq.innerHTML+=`
+    <div class="question">
+      <b>${x.q}</b><br>
+      A. ${x.a[0]}<br>B. ${x.a[1]}<br>
+      C. ${x.a[2]}<br>D. ${x.a[3]}
+    </div>`;
+  });
+  bank[t].tf.slice(0,numTF.value).forEach(x=>{
+    tf.innerHTML+=`
+    <div class="question">
+      <b>${x.q}</b><br>
+      a) ${x.a[0]}<br>b) ${x.a[1]}<br>
+      c) ${x.a[2]}<br>d) ${x.a[3]}
+    </div>`;
+  });
+  bank[t].essay.slice(0,numEssay.value).forEach(x=>{
+    essay.innerHTML+=`<div class="question"><b>${x}</b></div>`;
+  });
+}
+
+/* ===== EXPORT WORD ===== */
+function exportWord(){
+  let content = `
+  <h1>${examTitle.value}</h1>
+  <h2>I. Trắc nghiệm</h2>${mcq.innerHTML}
+  <h2>II. Đúng / Sai</h2>${tf.innerHTML}
+  <h2>III. Tự luận</h2>${essay.innerHTML}
+  `;
+  const blob = new Blob(['\ufeff',content],{
+    type:'application/msword'
+  });
+  const link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);
+  link.download='de_kiem_tra.doc';
+  link.click();
+}
+</script>
+
+</body>
+</html>

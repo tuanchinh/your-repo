@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>🎓 Trang học sinh</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    font-family:Segoe UI, sans-serif;
+    background:#f2f6fb;
+    margin:0;
+}
+.wrap{
+    max-width:1000px;
+    margin:25px auto;
+    background:#fff;
+    padding:25px;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+}
+h1{text-align:center;color:#0a4a8e}
+h2{color:#0b74d1;margin-top:30px}
+
+.card{
+    background:#f9fbfd;
+    padding:16px;
+    margin-top:15px;
+    border-radius:10px;
+    border-left:5px solid #0b74d1;
+}
+.deadline{color:#d32f2f;font-weight:600}
+button{
+    background:#0b74d1;
+    color:#fff;
+    padding:10px 18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:10px;
+}
+button:hover{background:#095ba8}
+.logout{
+    background:#888;
+}
+.logout:hover{background:#666}
+small{color:#555}
+.empty{
+    padding:12px;
+    background:#eee;
+    border-radius:8px;
+    margin-top:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<button class="logout" onclick="logout()">🚪 Đăng xuất</button>
+
+<h1>🎓 TRANG HỌC SINH</h1>
+
+<p>
+👩‍🎓 <b>Học sinh:</b> <span id="studentName"></span><br>
+🏫 <b>Lớp:</b> <span id="studentClass"></span>
+</p>
+
+<!-- ================== BÀI KIỂM TRA ================== -->
+<h2>📝 Bài kiểm tra được giao</h2>
+<div id="examList"></div>
+
+<!-- ================== HỌC LIỆU ================== -->
+<h2>📚 Học liệu giáo viên gửi</h2>
+<div id="materialList"></div>
+
+</div>
+
+<script>
+// ================== KIỂM TRA ĐĂNG NHẬP ==================
+const role = localStorage.getItem("role");
+if(role !== "student"){
+    alert("Bạn chưa đăng nhập!");
+    location.href="login.html";
+}
+
+const studentName = localStorage.getItem("studentName") || "Học sinh";
+const studentClass = localStorage.getItem("studentClass");
+
+document.getElementById("studentName").innerText = studentName;
+document.getElementById("studentClass").innerText = studentClass;
+
+// ================== LOAD BÀI KIỂM TRA ==================
+function loadExams(){
+    const box=document.getElementById("examList");
+    const exams=JSON.parse(localStorage.getItem("assigned_exams")||"[]");
+
+    const filtered=exams.filter(e=>e.className===studentClass && e.active);
+
+    if(filtered.length===0){
+        box.innerHTML="<div class='empty'>📭 Hiện chưa có bài kiểm tra</div>";
+        return;
+    }
+
+    box.innerHTML="";
+    filtered.forEach(e=>{
+        const div=document.createElement("div");
+        div.className="card";
+        div.innerHTML=`
+            <b>📄 Đề:</b> ${e.examFile}<br>
+            <span class="deadline">⏰ Hạn nộp: ${e.deadline}</span><br>
+            <small>👨‍🏫 GV: ${e.teacher} | 📅 Giao: ${e.assignedAt}</small><br>
+            <button onclick="startExam('${e.examFile}')">✍️ Làm bài</button>
+        `;
+        box.appendChild(div);
+    });
+}
+
+// ================== LOAD HỌC LIỆU ==================
+function loadMaterials(){
+    const box=document.getElementById("materialList");
+    const materials=JSON.parse(localStorage.getItem("learning_materials")||"[]");
+
+    const filtered=materials.filter(m=>m.className===studentClass);
+
+    if(filtered.length===0){
+        box.innerHTML="<div class='empty'>📭 Chưa có học liệu</div>";
+        return;
+    }
+
+    box.innerHTML="";
+    filtered.forEach(m=>{
+        const div=document.createElement("div");
+        div.className="card";
+        div.innerHTML=`
+            <b>📘 ${m.title}</b><br>
+            <a href="${m.link}" target="_blank">🔗 Mở học liệu</a><br>
+            <small>${m.note || ""}</small><br>
+            <small>👨‍🏫 ${m.teacher} | 📅 ${m.sentAt}</small>
+        `;
+        box.appendChild(div);
+    });
+}
+
+// ================== LÀM BÀI (OFFLINE) ==================
+function startExam(file){
+    localStorage.setItem("current_exam", file);
+    location.href="student_exam.html";
+}
+
+// ================== ĐĂNG XUẤT ==================
+function logout(){
+    localStorage.clear();
+    location.href="login.html";
+}
+
+// ================== INIT ==================
+loadExams();
+loadMaterials();
+</script>
+
+</body>
+</html>

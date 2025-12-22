@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>E-Learning – Quài Tở – Tênh Phông</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:linear-gradient(135deg,#e3f2fd,#f1f8ff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+}
+.login-box{
+    background:#0b5ed7;<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>E-Learning – Quài Tở – Tênh Phông | Đăng nhập</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    font-family:"Segoe UI",sans-serif;
+    background:linear-gradient(135deg,#1d4ed8,#60a5fa,#a5b4fc);
+    margin:0;
+    min-height:100vh;
+}
+
+/* ===== HEADER ===== */
+.top-banner{
+    text-align:center;
+    font-size:34px;
+    font-weight:900;
+    padding:25px 10px;
+    background:rgba(255,255,255,0.22);
+    color:#ffffff;
+    text-shadow:2px 2px 6px rgba(0,0,0,0.4);
+    letter-spacing:1px;
+    backdrop-filter:blur(6px);
+}
+.brand{
+    color:#ffeb3b;
+    text-shadow:2px 2px 8px rgba(0,0,0,0.55);
+}
+
+/* ===== LOGIN BOX ===== */
+.login-box{
+    width:380px;
+    margin:40px auto;
+    background:#fff;
+    padding:30px;
+    border-radius:16px;
+    box-shadow:0 12px 28px rgba(0,0,0,0.25);
+}
+.login-box h2{
+    text-align:center;
+    margin-top:0;
+    color:#1e293b;
+}
+
+/* ===== ROLE SELECT ===== */
+.role-select{
+    display:flex;
+    gap:10px;
+    margin-bottom:18px;
+}
+.role-select button{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#f59e0b;
+    color:#fff;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
+}
+.role-select button:hover{opacity:0.9}
+.role-select button.active{
+    background:#d97706;
+    box-shadow:0 0 8px rgba(0,0,0,0.25);
+    transform:scale(1.03);
+}
+
+/* ===== INPUT ===== */
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+    border:1px solid #cbd5e1;
+    font-size:16px;
+}
+input:disabled{
+    background:#f1f5f9;
+}
+
+/* ===== LOGIN BTN ===== */
+button.main-login{
+    width:100%;
+    padding:14px;
+    background:#2563eb;
+    border:none;
+    color:#fff;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+}
+button.main-login:hover{background:#1e40af}
+
+/* ===== INFO ===== */
+.role-label{
+    text-align:center;
+    font-weight:bold;
+    color:#0f172a;
+    margin-bottom:10px;
+}
+.error{
+    text-align:center;
+    color:#dc2626;
+    font-weight:bold;
+    min-height:22px;
+}
+
+/* ===== FOOTER ===== */
+footer{
+    text-align:center;
+    color:#fff;
+    font-size:15px;
+    margin-top:25px;
+    padding-bottom:20px;
+    text-shadow:1px 1px 4px rgba(0,0,0,0.45);
+}
+.author{
+    font-weight:bold;
+    color:#ffeb3b;
+}
+</style>
+</head>
+
+<body>
+
+<header class="top-banner">
+E-Learning – Quài Tở – <span class="brand">Tênh Phông</span>
+</header>
+
+<div class="login-box">
+
+<h2>🔐 ĐĂNG NHẬP HỆ THỐNG</h2>
+
+<div class="role-select">
+    <button id="btnTeacher" onclick="setRole('teacher')">👨‍🏫 Giáo viên</button>
+    <button id="btnStudent" onclick="setRole('student')">🎓 Học sinh</button>
+    <button id="btnAdmin" onclick="setRole('admin')">🛡 Admin</button>
+</div>
+
+<div id="roleLabel" class="role-label">
+👉 Vui lòng chọn loại tài khoản
+</div>
+
+<div id="errorMsg" class="error"></div>
+
+<input type="text" id="username" placeholder="Tên đăng nhập" disabled>
+<input type="password" id="password" placeholder="Mật khẩu" disabled>
+
+<button class="main-login" onclick="login()">Đăng nhập</button>
+
+</div>
+
+<footer>
+Tác giả: <span class="author">Đàm Anh Tuấn – Lò Văn Chinh</span>
+</footer>
+
+<script>
+/* ======================
+   AUTO REDIRECT
+====================== */
+(function(){
+    const role = localStorage.getItem("role");
+    if(!role) return;
+
+    if(role==="admin") location.href="admin_dashboard.html";
+    else if(role==="teacher") location.href="teacher_dashboard.html";
+    else if(role==="student") location.href="student_dashboard.html";
+})();
+
+/* ======================
+   ROLE SELECT
+====================== */
+let currentRole = "";
+
+function setRole(role){
+    currentRole = role;
+
+    document.getElementById("username").disabled = false;
+    document.getElementById("password").disabled = false;
+
+    ["btnTeacher","btnStudent","btnAdmin"]
+        .forEach(id=>document.getElementById(id).classList.remove("active"));
+
+    document.getElementById(
+        role==="teacher"?"btnTeacher":
+        role==="student"?"btnStudent":"btnAdmin"
+    ).classList.add("active");
+
+    document.getElementById("roleLabel").textContent =
+        role==="teacher" ? "🔑 Đăng nhập với tư cách GIÁO VIÊN" :
+        role==="student" ? "🎓 Đăng nhập với tư cách HỌC SINH" :
+        "🛡 Đăng nhập với tư cách ADMIN";
+}
+
+/* ======================
+   LOGIN
+====================== */
+function login(){
+    const user = username.value.trim();
+    const pass = password.value.trim();
+    const err  = errorMsg;
+
+    err.textContent = "";
+
+    if(!currentRole){
+        err.textContent="⚠️ Vui lòng chọn loại tài khoản!";
+        return;
+    }
+    if(!user || !pass){
+        err.textContent="⚠️ Vui lòng nhập đầy đủ thông tin!";
+        return;
+    }
+
+    localStorage.setItem("role", currentRole);
+    localStorage.setItem("username", user);
+
+    if(currentRole==="admin") location.href="admin_dashboard.html";
+    else if(currentRole==="teacher") location.href="teacher_dashboard.html";
+    else location.href="student_dashboard.html";
+}
+</script>
+
+</body>
+</html>
+    width:95%;
+    max-width:380px;
+    border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    padding:25px;
+}
+.title{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    color:#ffd700;
+    margin-bottom:10px;
+}
+.author{
+    text-align:center;
+    font-size:13px;
+    color:#ffe066;
+    margin-bottom:20px;
+}
+label{
+    color:#fff;
+    font-size:14px;
+    display:block;
+    margin-top:12px;
+}
+input{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    margin-top:6px;
+    font-size:14px;
+}
+button{
+    width:100%;
+    margin-top:18px;
+    padding:12px;
+    background:#ffd700;
+    color:#003566;
+    font-weight:bold;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:15px;
+}
+button:hover{
+    background:#ffea00;
+}
+.note{
+    margin-top:15px;
+    font-size:12px;
+    color:#e0e0e0;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+    <div class="title">E-Learning – Quài Tở – Tênh Phông</div>
+    <div class="author">Tác giả: Đàm Anh Tuấn – Lò Văn Chinh</div>
+
+    <label>Tên đăng nhập</label>
+    <input type="text" id="username" placeholder="Nhập username">
+
+    <label>Mật khẩu</label>
+    <input type="password" id="password" placeholder="Nhập mật khẩu">
+
+    <button onclick="login()">ĐĂNG NHẬP</button>
+
+    <div class="note">
+        👩‍🎓 Học sinh: dùng tài khoản được cấp<br>
+        👨‍🏫 Giáo viên / Admin: đăng nhập riêng
+    </div>
+</div>
+
+<script>
+// ==========================
+// TÀI KHOẢN GIÁO VIÊN & ADMIN
+// ==========================
+const teachers = {
+  "gv_damanhtuan03":"123456789",
+  "gv_nguyenducthuong03":"123456789",
+  "gv_lovanchinh03":"123456789",
+  "gv_lochikien03":"123456789",
+  "gv_nguyenthiphuong03":"123456789",
+  "gv_duongquangngoc03":"123456789",
+  "gv_quangvanhien03":"123456789",
+  "gv_nguyenphuonglan03":"123456789",
+  "gv_nguyenvanthang03":"123456789",
+  "gv_nguyenvanloi03":"123456789",
+  "gv_hoangthithinh03":"123456789"
+};
+
+const admin = {
+  "admin":"admin123"
+};
+
+// ==========================
+// ĐĂNG NHẬP
+// ==========================
+function login(){
+    const u=document.getElementById("username").value.trim();
+    const p=document.getElementById("password").value.trim();
+    if(!u||!p){
+        alert("Vui lòng nhập đủ tài khoản và mật khẩu");
+        return;
+    }
+
+    // ----- ADMIN -----
+    if(admin[u] && admin[u]===p){
+        localStorage.setItem("currentAdmin",u);
+        location.href="admin_dashboard.html";
+        return;
+    }
+
+    // ----- GIÁO VIÊN -----
+    if(teachers[u] && teachers[u]===p){
+        localStorage.setItem("currentTeacher",u);
+        location.href="teacher_dashboard.html";
+        return;
+    }
+
+    // ----- HỌC SINH (TỰ NHẬN DIỆN LỚP) -----
+    const grades=[6,7,8,9];
+    for(const g of grades){
+        const list=JSON.parse(localStorage.getItem("students_grade"+g))||[];
+        const found=list.find(s=>s.username===u && s.password===p);
+        if(found){
+            localStorage.setItem("currentStudent",JSON.stringify({
+                username:found.username,
+                fullname:found.fullname,
+                grade:g
+            }));
+            location.href="student_dashboard.html";
+            return;
+        }
+    }
+
+    alert("❌ Sai tài khoản hoặc mật khẩu");
+}
+</script>
+
+</body>
+</html>

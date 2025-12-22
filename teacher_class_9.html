@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý lớp 9</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#eef2f3;
+    margin:0;
+}
+header{
+    background:#005f99;
+    color:white;
+    padding:15px;
+    font-size:24px;
+    text-align:center;
+}
+.container{
+    width:90%;
+    margin:auto;
+    margin-top:20px;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+}
+th{
+    background:#005f99;
+    color:white;
+}
+button{
+    padding:6px 12px;
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+}
+.delete-btn{
+    background:#d00000;
+    color:white;
+}
+.add-btn{
+    background:#2b9348;
+    color:white;
+}
+.back-btn{
+    background:#6c757d;
+    color:white;
+}
+.box{
+    background:white;
+    padding:15px;
+    margin-top:20px;
+    border-radius:6px;
+    box-shadow:0 0 5px #bbb;
+}
+.note{
+    font-size:14px;
+    color:#444;
+}
+</style>
+</head>
+
+<body>
+
+<header>📘 QUẢN LÝ DANH SÁCH HỌC SINH LỚP 9</header>
+
+<div class="container">
+
+<table id="studentTable">
+<tr>
+    <th>STT</th>
+    <th>Họ và tên</th>
+    <th>Username</th>
+    <th>Password</th>
+    <th>Thao tác</th>
+</tr>
+</table>
+
+<div class="box">
+    <h3>📥 Nhập danh sách từ Excel</h3>
+    <input type="file" id="excelFile" accept=".xls,.xlsx">
+    <button class="add-btn" onclick="importExcel()">Nhập Excel</button>
+    <p class="note">📌 File Excel chỉ cần 1 cột: <b>Họ và tên</b></p>
+    <p class="note">🔿 Username tự tạo • 🔐 Password mặc định: <b>123456</b></p>
+</div>
+
+<br>
+<button class="back-btn" onclick="location.href='teacher_dashboard.html'">⬅ Quay lại</button>
+
+</div>
+
+<script>
+// ================== DATA ==================
+let students = JSON.parse(localStorage.getItem("students_grade9")) || [];
+
+// ================== UTIL ==================
+function toUsername(name){
+    return name.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+        .replace(/đ/g,"d")
+        .replace(/[^a-z\s]/g,"")
+        .trim().replace(/\s+/g,"_");
+}
+
+function save(){
+    localStorage.setItem("students_grade9", JSON.stringify(students));
+}
+
+// ================== TABLE ==================
+function loadTable(){
+    const table=document.getElementById("studentTable");
+    table.innerHTML=`
+    <tr>
+        <th>STT</th>
+        <th>Họ và tên</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Thao tác</th>
+    </tr>`;
+    students.forEach((s,i)=>{
+        table.innerHTML+=`
+        <tr>
+            <td>${i+1}</td>
+            <td>${s.fullname}</td>
+            <td>${s.username}</td>
+            <td>${s.password}</td>
+            <td><button class="delete-btn" onclick="removeStudent(${i})">Xóa</button></td>
+        </tr>`;
+    });
+}
+
+// ================== IMPORT EXCEL ==================
+function importExcel(){
+    const file=document.getElementById("excelFile").files[0];
+    if(!file){ alert("❌ Chưa chọn file Excel"); return; }
+
+    const reader=new FileReader();
+    reader.onload=e=>{
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
+        const sheet=wb.Sheets[wb.SheetNames[0]];
+        const rows=XLSX.utils.sheet_to_json(sheet,{header:1});
+
+        let added=0;
+        for(let i=1;i<rows.length;i++){
+            let fullname=rows[i][1] || rows[i][0];
+            if(!fullname) continue;
+
+            fullname=fullname.toString().trim();
+            let username=toUsername(fullname);
+
+            if(students.some(s=>s.username===username)) continue;
+
+            students.push({
+                fullname,
+                username,
+                password:"123456"
+            });
+            added++;
+        }
+        save();
+        loadTable();
+        alert(`✅ Đã thêm ${added} học sinh lớp 9`);
+        document.getElementById("excelFile").value="";
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// ================== DELETE ==================
+function removeStudent(i){
+    if(confirm("Bạn chắc chắn muốn xóa học sinh này?")){
+        students.splice(i,1);
+        save();
+        loadTable();
+    }
+}
+
+loadTable();
+</script>
+
+</body>
+</html>

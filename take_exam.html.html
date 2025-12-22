@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Làm bài kiểm tra</title>
+<style>
+body{font-family:Arial;background:#f4f6fb;padding:20px;}
+.question{background:#fff;padding:10px;margin-bottom:10px;border-radius:6px;}
+button{padding:8px 12px;border:none;background:#0b5ed7;color:white;border-radius:5px;}
+.status{margin-bottom:10px;font-weight:bold;}
+.offline{color:red;}
+.online{color:green;}
+</style>
+</head>
+<body>
+
+<h2>📝 Làm bài kiểm tra</h2>
+<div id="netStatus" class="status"></div>
+
+<div id="questions"></div>
+
+<button onclick="submitExam()">📤 Nộp bài</button>
+
+<script>
+// ==========================
+// KIỂM TRA ĐĂNG NHẬP
+// ==========================
+const student = JSON.parse(localStorage.getItem("currentStudent"));
+if(!student) location.href="login.html";
+
+const exams = JSON.parse(localStorage.getItem("exams_grade"+student.grade)) || [];
+const index = localStorage.getItem("currentExamIndex");
+const exam = exams[index];
+
+// ==========================
+// HIỂN THỊ CÂU HỎI
+// ==========================
+const qDiv = document.getElementById("questions");
+exam.questions.forEach((q,i)=>{
+    qDiv.innerHTML += `
+      <div class="question">
+        <strong>Câu ${i+1}:</strong> ${q}<br>
+        <input type="text" id="ans_${i}" placeholder="Nhập đáp án">
+      </div>
+    `;
+});
+
+// ==========================
+// KIỂM TRA MẠNG
+// ==========================
+function updateStatus(){
+    const status = navigator.onLine
+      ? "<span class='online'>🟢 Có mạng</span>"
+      : "<span class='offline'>🔴 Đang offline</span>";
+    document.getElementById("netStatus").innerHTML = status;
+}
+window.addEventListener("online",updateStatus);
+window.addEventListener("offline",updateStatus);
+updateStatus();
+
+// ==========================
+// NỘP BÀI
+// ==========================
+function submitExam(){
+    const answers = {};
+    exam.questions.forEach((_,i)=>{
+        answers[i] = document.getElementById("ans_"+i).value;
+    });
+
+    const submission = {
+        username: student.username,
+        grade: student.grade,
+        examTitle: exam.title,
+        answers,
+        time: new Date().toLocaleString(),
+        synced: false
+    };
+
+    let offline = JSON.parse(localStorage.getItem("offline_submissions")) || [];
+    offline.push(submission);
+    localStorage.setItem("offline_submissions",JSON.stringify(offline));
+
+    alert(navigator.onLine
+        ? "Đã nộp bài!"
+        : "Mất mạng – bài đã lưu, sẽ tự nộp khi có mạng");
+
+    location.href="student_dashboard.html";
+}
+</script>
+</body>
+</html>

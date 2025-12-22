@@ -1,0 +1,22 @@
+[
+  {
+    "studentId": "HS001",
+    "class": "9A",
+    "examCode": "MATH9_B1",
+    "submittedAt": "2025-01-01T08:00:00Z",
+    "scoreAuto": 6,
+    "answers": [
+      {
+        "id": 1,
+        "type": "mcq",
+        "answer": "A",
+        "correct": "A"
+      },
+      {
+        "id": 2,
+        "type": "essay",
+        "answer": "Phương trình bậc hai có dạng ax²+bx+c=0..."
+      }
+    ]
+  }
+]
