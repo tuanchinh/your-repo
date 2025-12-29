@@ -1,161 +1,317 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>Tạo đề kiểm tra</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta charset="utf-8">
+<title>📘 Hệ thống tạo đề kiểm tra nâng cao – Mượn câu</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 <style>
-body{
-  margin:0;
-  font-family:"Segoe UI",Arial,sans-serif;
-  background:linear-gradient(180deg,#dcecff,#eef6ff);
-  color:#1e3a5f;
-}
-header{
-  background:#1e4f91;
-  padding:14px;
-  text-align:center;
-  color:#f5c542;
-  font-weight:800;
-}
-.container{max-width:1100px;margin:auto;padding:16px}
-.section{
-  background:#fff;
-  border-radius:14px;
-  padding:18px;
-  margin-bottom:18px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.15);
-}
-.section h2{margin-top:0;color:#1e4f91}
-input,textarea,select{
-  width:100%;padding:10px;margin-top:6px;
-  border-radius:8px;border:1px solid #c7d7ea;
-}
-textarea{min-height:70px}
-button{
-  margin-top:10px;padding:10px 14px;
-  border:none;border-radius:10px;
-  background:#1e4f91;color:#fff;
-  font-weight:bold;cursor:pointer;
-}
-button:hover{background:#163d70}
-.small-btn{background:#d93025}
-.question{
-  border:1px dashed #c7d7ea;
-  padding:12px;border-radius:10px;margin-top:10px;
-}
+body{font-family:'Roboto',sans-serif;background:#f4f6f9;margin:0;padding:20px;}
+h1{text-align:center;color:#2c3e50;}
+.card{background:#fff;border-radius:8px;padding:20px;margin:15px auto;max-width:1000px;box-shadow:0 4px 8px rgba(0,0,0,0.1);}
+label{display:block;margin:10px 0 5px;font-weight:bold;}
+input, select{padding:8px;border:1px solid #ccc;border-radius:6px;}
+input[type=number]{width:60px;}
+.level-inputs{display:flex;gap:10px;margin-bottom:10px;}
+.level-inputs input{width:80px;}
+.btn-group{text-align:center;margin-top:20px;}
+button{background:#3498db;color:white;border:none;padding:10px 18px;margin:5px;border-radius:6px;cursor:pointer;transition:0.3s;}
+button:hover{background:#2980b9;}
+.question{margin:5px 0;padding:5px;border-left:4px solid #3498db;background:#fefefe;position:relative;}
+.question.truefalse{border-left-color:#27ae60;background:#f0fff0;}
+.question.short{border-left-color:#8e44ad;background:#f8f0ff;}
+.question.essay{border-left-color:#e67e22;background:#fff8f0;}
+#container{margin-top:20px;padding:15px;background:#ecf0f1;border-radius:8px;border:1px solid #bdc3c7;}
+.section-title{font-size:18px;font-weight:bold;margin-bottom:10px;color:#2c3e50;}
+.code-label{font-weight:bold;color:#c0392b;margin-bottom:10px;font-size:16px;}
+.points-container{margin:10px 0;padding:10px;background:#f0f8ff;border:1px solid #90caf9;border-radius:6px;}
+.points-container input{width:60px;}
 </style>
 </head>
-
 <body>
 
-<header>E-Learning – Quài Tở – Tênh Phông</header>
+<h1>📘 Hệ thống tạo đề kiểm tra nâng cao – Mượn câu</h1>
 
-<div class="container">
-
-<!-- ===== THÔNG TIN ===== -->
-<div class="section">
-<h2>📝 Thông tin đề</h2>
-<input id="examTitle" placeholder="Tên đề kiểm tra">
-<select id="topic">
-  <option value="tin6">Tin học 6 – Bài 1</option>
-  <option value="tin7">Tin học 7 – Bài 3</option>
+<div class="card">
+<label>Môn học:</label>
+<select id="subjectSelect">
+<option>Toán</option>
+<option>Ngữ văn</option>
+<option>Tiếng Anh</option>
+<option>Lịch sử</option>
+<option>Tin học</option>
 </select>
+
+<label>Lớp:</label>
+<select id="gradeSelect">
+<option>6</option><option>7</option><option>8</option><option>9</option>
+</select>
+
+<label>Bài muốn tạo (ví dụ: 1,3,5):</label>
+<input type="text" id="lessonInput" placeholder="1,3,5">
+
+<label>Số đề cần tạo:</label>
+<input type="number" id="numExamsInput" value="1" min="1">
+
+<label>Tổng số câu trong đề:</label>
+<input type="number" id="totalQuestionsInput" value="19" min="1">
+
+<div class="points-container">
+<p><b>Điểm theo loại câu và mức độ:</b></p>
+<table>
+<tr><td>MCQ:</td>
+<td>Nhận biết <input type="number" id="scoreMcq_nhanbiet" value="0.5" step="0.1"></td>
+<td>Thông hiểu <input type="number" id="scoreMcq_thonghieu" value="1" step="0.1"></td>
+<td>Vận dụng <input type="number" id="scoreMcq_vandung" value="1.5" step="0.1"></td>
+</tr>
+<tr><td>True/False:</td>
+<td>Nhận biết <input type="number" id="scoreTruefalse_nhanbiet" value="0.5" step="0.1"></td>
+<td>Thông hiểu <input type="number" id="scoreTruefalse_thonghieu" value="1" step="0.1"></td>
+<td>Vận dụng <input type="number" id="scoreTruefalse_vandung" value="1.5" step="0.1"></td>
+</tr>
+<tr><td>Short Answer:</td>
+<td>Nhận biết <input type="number" id="scoreShort_nhanbiet" value="1" step="0.1"></td>
+<td>Thông hiểu <input type="number" id="scoreShort_thonghieu" value="1.5" step="0.1"></td>
+<td>Vận dụng <input type="number" id="scoreShort_vandung" value="2" step="0.1"></td>
+</tr>
+<tr><td>Essay:</td>
+<td>Nhận biết <input type="number" id="scoreEssay_nhanbiet" value="2" step="0.1"></td>
+<td>Thông hiểu <input type="number" id="scoreEssay_thonghieu" value="3" step="0.1"></td>
+<td>Vận dụng <input type="number" id="scoreEssay_vandung" value="4" step="0.1"></td>
+</tr>
+</table>
 </div>
 
-<!-- ===== NGÂN HÀNG ===== -->
-<div class="section">
-<h2>📚 Tự động lấy câu hỏi từ ngân hàng</h2>
-<label>Số câu trắc nghiệm</label>
-<input type="number" id="numMCQ" value="3">
-
-<label>Số câu đúng / sai</label>
-<input type="number" id="numTF" value="1">
-
-<label>Số câu tự luận</label>
-<input type="number" id="numEssay" value="1">
-
-<button onclick="autoFill()">⚡ Tự động tạo đề</button>
+<div id="questionNumbersContainer">
+<p>Chọn số câu cho mỗi loại câu hỏi mỗi bài theo mức độ:</p>
+<label>MCQ mỗi bài:</label>
+<div class="level-inputs">
+  <input type="number" id="numMcq_nhanbiet" value="2" min="0" placeholder="Nhận biết">
+  <input type="number" id="numMcq_thonghieu" value="2" min="0" placeholder="Thông hiểu">
+  <input type="number" id="numMcq_vandung" value="2" min="0" placeholder="Vận dụng">
 </div>
 
-<!-- ===== NỘI DUNG ĐỀ ===== -->
-<div class="section">
-<h2>I. Trắc nghiệm</h2>
-<div id="mcq"></div>
+<label>True/False mỗi bài:</label>
+<div class="level-inputs">
+  <input type="number" id="numTruefalse_nhanbiet" value="1" min="0" placeholder="Nhận biết">
+  <input type="number" id="numTruefalse_thonghieu" value="1" min="0" placeholder="Thông hiểu">
+  <input type="number" id="numTruefalse_vandung" value="1" min="0" placeholder="Vận dụng">
 </div>
 
-<div class="section">
-<h2>II. Đúng / Sai</h2>
-<div id="tf"></div>
+<label>Short Answer mỗi bài:</label>
+<div class="level-inputs">
+  <input type="number" id="numShort_nhanbiet" value="1" min="0" placeholder="Nhận biết">
+  <input type="number" id="numShort_thonghieu" value="1" min="0" placeholder="Thông hiểu">
+  <input type="number" id="numShort_vandung" value="1" min="0" placeholder="Vận dụng">
 </div>
 
-<div class="section">
-<h2>III. Tự luận</h2>
-<div id="essay"></div>
+<label>Essay mỗi bài:</label>
+<div class="level-inputs">
+  <input type="number" id="numEssay_nhanbiet" value="1" min="0" placeholder="Nhận biết">
+  <input type="number" id="numEssay_thonghieu" value="1" min="0" placeholder="Thông hiểu">
+  <input type="number" id="numEssay_vandung" value="1" min="0" placeholder="Vận dụng">
+</div>
 </div>
 
-<button onclick="exportWord()">📄 Xuất file Word</button>
-
+<div class="btn-group">
+<button id="generateBtn">🚀 Tạo đề</button>
+<button id="loadJSONBtn">📂 Load JSON câu hỏi</button>
+<input type="file" id="jsonFileInput" style="display:none" accept=".json" multiple>
+<button id="previewBtn">👀 Xem trước</button>
+<button id="exportWordBtn">📄 Xuất Word từng đề</button>
+<button id="exportPdfBtn">📄 Xuất PDF từng đề</button>
+<button id="exportJsonBtn">💾 Xuất JSON từng đề</button>
 </div>
 
+<div id="container"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@7.5.0/build/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-/* ===== NGÂN HÀNG CÂU HỎI (MẪU) ===== */
-const bank = {
-  tin6: {
-    mcq:[
-      {q:"Máy tính dùng để làm gì?",a:["Học","Chơi","Làm việc","Tất cả"],ans:"D"},
-      {q:"Thiết bị nhập là?",a:["Chuột","Màn hình","Loa","Máy in"],ans:"A"},
-      {q:"Internet là gì?",a:["Mạng máy tính","Phần mềm","Thiết bị","Trò chơi"],ans:"A"}
-    ],
-    tf:[
-      {q:"Đánh dấu đúng/sai",a:["Máy tính cần điện","Chuột là thiết bị nhập","Màn hình nhập dữ liệu","Internet giúp học tập"]}
-    ],
-    essay:["Nêu ích lợi của Internet"]
-  }
+const { jsPDF } = window.jspdf;
+const { Document, Packer, Paragraph, TextRun } = docx;
+let questionsJSON = [];
+let generatedExams = [];
+
+function generateExamCode(){ return "DE-"+Math.floor(1000+Math.random()*9000);}
+function capitalize(str){ return str.charAt(0).toUpperCase()+str.slice(1);}
+function getScoreMap(){
+  const types=["mcq","truefalse","short","essay"];
+  const levels=["nhanbiet","thonghieu","vandung"];
+  const map={};
+  types.forEach(type=>{
+    map[type]={};
+    levels.forEach(level=>{
+      const el=document.getElementById(`score${capitalize(type)}_${level}`);
+      map[type][capitalize(level)] = parseFloat(el.value)||0;
+    });
+  });
+  return map;
+}
+
+// ---------- Load JSON ----------
+document.getElementById("loadJSONBtn").onclick = ()=>document.getElementById("jsonFileInput").click();
+document.getElementById("jsonFileInput").onchange = e=>{
+  const files=Array.from(e.target.files);
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(!Array.isArray(data.questions)){ alert("File JSON không đúng định dạng!"); return; }
+        data.questions.forEach(q=>{
+          if(q.type==="truefalse" && !q.options) q.options={A:"Đúng",B:"Sai",C:"Không biết",D:"Không áp dụng"};
+          if(!q.level) q.level="Nhận biết";
+          if(!q.lesson) q.lesson="1";
+          questionsJSON.push(q);
+        });
+        alert(`Đã load JSON: ${file.name}, tổng câu hỏi hiện có: ${questionsJSON.length}`);
+      }catch(err){ alert("Lỗi đọc file JSON: "+err);}
+    };
+    reader.readAsText(file);
+  });
 };
 
-/* ===== AUTO FILL ===== */
-function autoFill(){
-  mcq.innerHTML=tf.innerHTML=essay.innerHTML="";
-  const t = topic.value;
-  bank[t].mcq.slice(0,numMCQ.value).forEach(x=>{
-    mcq.innerHTML+=`
-    <div class="question">
-      <b>${x.q}</b><br>
-      A. ${x.a[0]}<br>B. ${x.a[1]}<br>
-      C. ${x.a[2]}<br>D. ${x.a[3]}
-    </div>`;
-  });
-  bank[t].tf.slice(0,numTF.value).forEach(x=>{
-    tf.innerHTML+=`
-    <div class="question">
-      <b>${x.q}</b><br>
-      a) ${x.a[0]}<br>b) ${x.a[1]}<br>
-      c) ${x.a[2]}<br>d) ${x.a[3]}
-    </div>`;
-  });
-  bank[t].essay.slice(0,numEssay.value).forEach(x=>{
-    essay.innerHTML+=`<div class="question"><b>${x}</b></div>`;
-  });
-}
+// ---------- Tạo đề giữ thứ tự 1->n ----------
+document.getElementById("generateBtn").onclick = ()=>{
+  const lessons=document.getElementById("lessonInput").value.split(",").map(n=>n.trim()).filter(n=>n!=="");
+  const numExams=parseInt(document.getElementById("numExamsInput").value);
+  const totalQuestions=parseInt(document.getElementById("totalQuestionsInput").value)||19;
+  if(lessons.length===0){ alert("Nhập ít nhất 1 bài!"); return; }
+  if(questionsJSON.length===0){ alert("Chưa load JSON!"); return; }
+  const scoreMap=getScoreMap();
+  generatedExams=[];
 
-/* ===== EXPORT WORD ===== */
-function exportWord(){
-  let content = `
-  <h1>${examTitle.value}</h1>
-  <h2>I. Trắc nghiệm</h2>${mcq.innerHTML}
-  <h2>II. Đúng / Sai</h2>${tf.innerHTML}
-  <h2>III. Tự luận</h2>${essay.innerHTML}
-  `;
-  const blob = new Blob(['\ufeff',content],{
-    type:'application/msword'
+  for(let e=0;e<numExams;e++){
+    const examCode=generateExamCode();
+    const exam={examCode,subject:document.getElementById("subjectSelect").value,grade:document.getElementById("gradeSelect").value,questions:[]};
+    let allPicked=[];
+
+    lessons.forEach(lesson=>{
+      const types=["mcq","truefalse","short","essay"];
+      types.forEach(type=>{
+        const idPrefix="num"+type.charAt(0).toUpperCase()+type.slice(1);
+        const nb=parseInt(document.getElementById(idPrefix+"_nhanbiet").value)||0;
+        const th=parseInt(document.getElementById(idPrefix+"_thonghieu").value)||0;
+        const vd=parseInt(document.getElementById(idPrefix+"_vandung").value)||0;
+        const levels=["Nhận biết","Thông hiểu","Vận dụng"];
+        const counts=[nb,th,vd];
+
+        levels.forEach((level,idx)=>{
+          let needed=counts[idx];
+          let picked=[];
+          let poolCurrent=questionsJSON.filter(q=>q.lesson===lesson && q.type===type && q.level===level);
+          picked.push(...poolCurrent.slice(0,needed).map(q=>({...q,fromLesson:q.lesson})));
+          needed -= picked.length;
+
+          if(needed>0){
+            let otherPool=questionsJSON.filter(q=>q.lesson!==lesson && q.type===type && q.level===level);
+            picked.push(...otherPool.slice(0,needed).map(q=>({...q,fromLesson:q.lesson})));
+            needed -= otherPool.length;
+          }
+          if(needed>0) alert(`⚠ Không đủ câu cho ${type.toUpperCase()} mức ${level} (lấy ${counts[idx]-needed}/${counts[idx]})`);
+
+          picked.forEach(q=>{ if(allPicked.length<totalQuestions) allPicked.push(q); });
+        });
+      });
+    });
+
+    exam.questions=allPicked; // Giữ nguyên thứ tự
+    generatedExams.push(exam);
+  }
+  alert(`Đã tạo ${numExams} đề, mỗi đề tối đa ${totalQuestions} câu!`);
+};
+
+// ---------- Xem trước ----------
+document.getElementById("previewBtn").onclick = ()=>{
+  container.innerHTML="";
+  generatedExams.forEach(exam=>{
+    const codeDiv=document.createElement("div");
+    codeDiv.className="code-label";
+    codeDiv.textContent=`Mã đề: ${exam.examCode}`;
+    container.appendChild(codeDiv);
+    const div=document.createElement("div");
+    div.innerHTML=`<div class="section-title">${exam.subject} – Lớp ${exam.grade}</div>`;
+    let cnt=1;
+    const scoreMap=getScoreMap();
+    exam.questions.forEach(q=>{
+      const qd=document.createElement("div");
+      qd.className="question "+q.type;
+      const fromText=(q.fromLesson && q.fromLesson!==q.lesson)?` (mượn từ bài ${q.fromLesson})`:"";
+      const score=scoreMap[q.type][q.level]||0;
+      if(q.type==="mcq"||q.type==="truefalse")
+        qd.innerHTML=`<b>${cnt}. ${q.content} (${q.level}) – ${score} điểm${fromText}</b><br>A. ${q.options.A}<br>B. ${q.options.B}<br>C. ${q.options.C}<br>D. ${q.options.D}`;
+      else if(q.type==="short")
+        qd.innerHTML=`<b>${cnt}. ${q.content} (${q.level}) – ${score} điểm${fromText}</b> (Trả lời ngắn)`;
+      else
+        qd.innerHTML=`<b>${cnt}. ${q.content} (${q.level}) – ${score} điểm${fromText}</b><br><i>(Học sinh tự làm)</i>`;
+      div.appendChild(qd);
+      cnt++;
+    });
+    container.appendChild(div);
   });
-  const link=document.createElement('a');
-  link.href=URL.createObjectURL(blob);
-  link.download='de_kiem_tra.doc';
-  link.click();
-}
+};
+
+// ---------- Xuất Word ----------
+document.getElementById("exportWordBtn").onclick = async ()=>{
+  const scoreMap=getScoreMap();
+  for(const exam of generatedExams){
+    const paragraphs=[];
+    paragraphs.push(new Paragraph({children:[new TextRun({text:`MÃ ĐỀ: ${exam.examCode}`,bold:true,color:"red",size:28*2})]}));
+    paragraphs.push(new Paragraph({children:[new TextRun({text:`${exam.subject} – Lớp ${exam.grade}`,bold:true,size:26*2})]}));
+    const totalScore=exam.questions.reduce((sum,q)=>sum+(scoreMap[q.type][q.level]||0),0);
+    paragraphs.push(new Paragraph({children:[new TextRun({text:`Tổng số câu: ${exam.questions.length} – Tổng điểm: ${totalScore}`,bold:true})]}));
+
+    exam.questions.forEach((q,idx)=>{
+      const score=scoreMap[q.type][q.level]||0;
+      const fromText=(q.fromLesson && q.fromLesson!==q.lesson)?` (mượn từ bài ${q.fromLesson})`:"";
+      paragraphs.push(new Paragraph({children:[new TextRun({text:`${idx+1}. ${q.content} (${q.level}) – ${score} điểm${fromText}`,bold:true})]}));
+      if(q.type==="mcq"||q.type==="truefalse"){
+        Object.entries(q.options).forEach(([k,v])=>paragraphs.push(new Paragraph({children:[new TextRun({text:`${k}. ${v}`})]})));
+      } else for(let i=0;i<5;i++) paragraphs.push(new Paragraph({children:[new TextRun({text:"...................................................................................."})]}));
+    });
+
+    const doc=new Document({sections:[{children:paragraphs}]});
+    const blob=await Packer.toBlob(doc);
+    saveAs(blob,`De_${exam.examCode}.docx`);
+  }
+  alert("✅ Xuất Word thành công!");
+};
+
+// ---------- Xuất PDF ----------
+document.getElementById("exportPdfBtn").onclick=()=>{
+  const scoreMap=getScoreMap();
+  generatedExams.forEach(exam=>{
+    const pdf=new jsPDF();
+    pdf.setFontSize(12);
+    pdf.text(`MÃ ĐỀ: ${exam.examCode}`,10,10);
+    pdf.text(`${exam.subject} – Lớp ${exam.grade}`,10,18);
+    const totalScore=exam.questions.reduce((sum,q)=>sum+(scoreMap[q.type][q.level]||0),0);
+    pdf.text(`Tổng số câu: ${exam.questions.length} – Tổng điểm: ${totalScore}`,10,26);
+
+    let y=34;
+    exam.questions.forEach((q,idx)=>{
+      const score=scoreMap[q.type][q.level]||0;
+      const fromText=(q.fromLesson && q.fromLesson!==q.lesson)?` (mượn từ bài ${q.fromLesson})`:"";
+      pdf.text(`${idx+1}. ${q.content} (${q.level}) – ${score} điểm${fromText}`,10,y);
+      y+=6;
+      if(q.type==="mcq"||q.type==="truefalse") Object.entries(q.options).forEach(([k,v])=>{pdf.text(`${k}. ${v}`,12,y);y+=6;});
+      else for(let i=0;i<5;i++){pdf.text("........................................................................",12,y);y+=6;}
+      if(y>270){pdf.addPage();y=10;}
+    });
+    pdf.save(`De_${exam.examCode}.pdf`);
+  });
+  alert("✅ Xuất PDF thành công!");
+};
+
+// ---------- Xuất JSON ----------
+document.getElementById("exportJsonBtn").onclick=()=>{
+  generatedExams.forEach(exam=>{
+    const blob=new Blob([JSON.stringify(exam,null,2)],{type:"application/json"});
+    saveAs(blob,`De_${exam.examCode}.json`);
+  });
+  alert("✅ Xuất JSON thành công!");
+};
 </script>
 
 </body>
